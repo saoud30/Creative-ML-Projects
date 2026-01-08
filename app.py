@@ -1,29 +1,70 @@
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
 
-st.set_page_config(layout="wide")
-st.title("🍂 Autumn Air Quality → Health Risk Comparison")
+st.set_page_config(page_title="Autumn Air Quality & Health Risk", layout="wide")
 
-city = st.selectbox("Select City", ["Delhi", "Helsinki"])
+st.title("🍂 Autumn Air Quality → Health Risk Analysis")
+st.caption("Seasonal comparison of air pollution impact on human health")
 
-df = pd.read_csv(f"{city.lower()}_data.csv", parse_dates=["date"])
+# Load data
+cities = {
+    "Delhi 🇮🇳": (
+        pd.read_csv("delhi_data.csv", parse_dates=["date"]),
+        pd.read_csv("delhi_forecast.csv", parse_dates=["date"])
+    ),
+    "Helsinki 🇫🇮": (
+        pd.read_csv("helsinki_data.csv", parse_dates=["date"]),
+        pd.read_csv("helsinki_forecast.csv", parse_dates=["date"])
+    ),
+    "Amsterdam 🇳🇱": (
+        pd.read_csv("amsterdam_data.csv", parse_dates=["date"]),
+        pd.read_csv("amsterdam_forecast.csv", parse_dates=["date"])
+    )
+}
 
-st.subheader(f"Health Risk Overview: {city}")
+# --- METRICS ---
+st.subheader("📊 City Comparison (Autumn Averages)")
+cols = st.columns(3)
 
-st.metric("Average Health Risk Score", round(df["health_risk_score"].mean(), 2))
-st.metric("Highest Risk Level", df["risk_level"].mode()[0])
+for col, (city, (df, _)) in zip(cols, cities.items()):
+    with col:
+        st.markdown(f"### {city}")
+        st.metric("Avg PM2.5", round(df["pm25"].mean(), 1))
+        st.metric("Avg Health Risk", round(df["health_risk_score"].mean(), 1))
+        st.metric("Dominant Risk", df["risk_level"].mode()[0])
 
-st.line_chart(df.set_index("date")[["pm25", "pm10", "no2"]])
+# --- HISTORICAL TRENDS ---
+st.subheader("📈 Historical Health Risk Trends")
+trend_cols = st.columns(3)
 
-st.subheader("Health Risk Timeline")
-st.line_chart(df.set_index("date")["health_risk_score"])
+for col, (city, (df, _)) in zip(trend_cols, cities.items()):
+    with col:
+        st.markdown(f"#### {city}")
+        st.line_chart(df.set_index("date")["health_risk_score"])
 
-st.subheader("🩺 Health Advisory")
-latest = df.iloc[-1]
-if latest["risk_level"] == "High":
-    st.error("High risk: Elderly, children, and asthma patients should avoid outdoor exposure.")
-elif latest["risk_level"] == "Moderate":
-    st.warning("Moderate risk: Limit prolonged outdoor activity.")
-else:
-    st.success("Low risk: Safe for most outdoor activities.")
+# --- FORECAST ---
+st.subheader("🔮 7-Day Health Risk Forecast")
+forecast_cols = st.columns(3)
+
+for col, (city, (_, forecast)) in zip(forecast_cols, cities.items()):
+    with col:
+        st.markdown(f"#### {city}")
+        st.line_chart(forecast.set_index("date")["forecast_health_risk"])
+
+# --- ADVISORY ---
+st.subheader("🩺 Latest Health Advisory")
+adv_cols = st.columns(3)
+
+for col, (city, (df, _)) in zip(adv_cols, cities.items()):
+    latest = df.iloc[-1]
+    with col:
+        st.markdown(f"#### {city}")
+        if latest["risk_level"] == "High":
+            st.error("High risk: Avoid outdoor activity. Vulnerable groups at risk.")
+        elif latest["risk_level"] == "Moderate":
+            st.warning("Moderate risk: Limit prolonged outdoor exposure.")
+        else:
+            st.success("Low risk: Safe for outdoor activities.")
+
+st.markdown("---")
+st.caption("Built using real-world air quality data and a custom health risk index.")
