@@ -1,0 +1,39 @@
+/* General Body */
+.stApp {
+    background-color: #0e1117;
+    color: #ffffff;
+}
+
+/* Custom Card Styling */
+.card {
+    background-color: #1e2129;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #30363d;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    margin-bottom: 20px;
+}
+
+/* Metric Value Styling */
+[data-testid="stMetricValue"] {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+/* Hide Streamlit Default Footer */
+footer {
+    visibility: hidden;
+}
+
+/* Tab Header Styling */
+.stTabs [data-baseweb="tab-list"] {
+    gap: 20px;
+}
+
+.stTabs [data-baseweb="tab"] {
+    height: 50px;
+    white-space: pre-wrap;
+    background-color: #1e2129;
+    border-radius: 5px 5px 0 0;
+    padding-top: 10px;
+}
