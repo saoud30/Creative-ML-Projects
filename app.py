@@ -288,7 +288,7 @@ if not df.empty:
             else:
                 st.write("Unusually sensitive people should consider reducing prolonged outdoor exertion.")
         else:
-            st.error("**Health Alert: Unhealthy Air.**)
+            st.error("**Health Alert: Unhealthy Air.**")
             if multiplier > 1.0:
                 st.write("**High Risk for You:** Avoid all outdoor physical activity. If you must go out, wear an N95 mask.")
             else:
